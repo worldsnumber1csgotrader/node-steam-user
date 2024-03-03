@@ -56,6 +56,8 @@ class SteamUserConnection extends SteamUserEnums {
 
 	_cleanupClosedConnection() {
 		this._connecting = false;
+		clearTimeout(this._connectingTimeout);
+
 		this._loggingOff = false;
 
 		this._cancelReconnectTimers();

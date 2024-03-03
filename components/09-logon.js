@@ -63,6 +63,15 @@ class SteamUserLogon extends SteamUserMachineAuth {
 			this._connecting = true;
 			this._loggingOff = false;
 
+			// At the beginning of your logOn function
+			this._connectingTimeout = setTimeout(() => {
+				if (this._connecting) {
+					this.emit('error', new Error('Connection attempt timed out.'));
+					this._disconnect(true);
+					this._connecting = false;
+				}
+			}, 70 * 1000);
+
 			if (details !== true) {
 				// We're not logging on with saved details
 				details = details || {};
@@ -701,6 +710,7 @@ class SteamUserLogon extends SteamUserMachineAuth {
 		this.emit('debug', `Handle logon response (${EResult[body.eresult]})`);
 
 		this._connecting = false;
+		clearTimeout(this._connectingTimeout);
 
 		clearTimeout(this._reconnectForCloseDuringAuthTimeout);
 		delete this._reconnectForCloseDuringAuthTimeout;
